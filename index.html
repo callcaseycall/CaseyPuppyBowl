@@ -1,12 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title></title>
+    <title>Puppy Bowl</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="index.css" />
     <script src="index.js" defer></script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="loading-screen">
+      <img src="/sr.gif" />
+    </div>
+    <header>
+      <h1>Puppy Bowl</h1>
+    </header>
+    <form>
+      <label>Name: <input required id="new-name" type="text" /></label>
+      <label>Breed: <input required if="new-breed" type="text" /></label>
+      <label>Image URL: <input id="new-image" type="text" /></label>
+      <button>Submit</button>
+    </form>
+    <main id="content"></main>
+    <footer>
+      <p>Casey</p>
+    </footer>
   </body>
 </html>
