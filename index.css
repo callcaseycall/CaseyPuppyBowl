@@ -1,0 +1,14 @@
+#main {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+#player-section {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+#selected {
+  flex: 1;
+}

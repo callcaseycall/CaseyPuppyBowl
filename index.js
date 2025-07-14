@@ -1,170 +1,182 @@
-const API_URL =
-  "https://fsa-puppy-bowl.herokuapp.com/api/2505-FTB-CT-WEB-PT-CaseyC";
+const API_URL = "https://fsa-puppy-bowl.herokuapp.com/api";
+const COHORT = "/2505-FTB-CT-WEB-PT-CaseyC";
+const API = API_URL + COHORT;
 const $form = document.querySelector("form");
-const $main = document.querySelector("main");
-const $loading = document.querySelector("#loading-screen");
+const $app = document.querySelector("#app");
 let teams = [];
 
-function showLoading() {
-  $loading.setAttribute("style", "display:flex;");
-}
-
-function hideLoading() {
-  $loading.setAttribute("style", "display:none;");
-}
-
-async function fetchAllPlayers() {
+const fetchAllPlayers = async () => {
   try {
-    //see "Get all players"
+    const response = await fetch(`${API}/players`);
+    const result = await response.json();
+    return result.data.players;
   } catch (err) {
     console.error(err.message);
+    return [];
   }
-}
+};
 
-async function createPlayer(name, breed, imageUrl) {
+const fetchPlayerById = async (id) => {
   try {
-    //see "Invite a new player"
-    //remember methods and headers
-    return json.data.newPlayer;
+    const response = await fetch(`${API}/players/${id}`);
+    const result = await response.json();
+    return result.data.player;
   } catch (err) {
     console.error(err.message);
+    return [];
   }
-}
+};
 
-async function fetchPlayerById(id) {
-  try {
-    // see "Get a player by ID"
-  } catch (err) {
-    console.error(err.message);
-  }
-}
+const playerListItems = (player) => {
+  const $li = document.createElement("li");
 
-async function removePlayerById(id) {
-  try {
-    // see "Remove a player by ID"
-    // remember to set method
-  } catch (err) {
-    console.error(err.message);
-  }
-}
-
-async function fetchAllTeams() {
-  try {
-    // see "Get all teams"
-  } catch (err) {
-    console.error(err.message);
-  }
-}
-
-async function renderAllPlayers() {
-  const playerList = await fetchAllPlayers();
-  //console.log(playerList);
-  const $players = document.createElement("ul");
-  $players.id = "player-list";
-  playerList.forEach((player) => {
-    const $player = document.createElement("li");
-    $player.className = "player-card";
-    $player.innerHTML += `
-        <h2>${player.name}</h2>
-        <p>${player.breed}</p>
-        <img src="${player.imageUrl}" alt="Picture of ${player.name}" />
-        <section class="player-actions">
-            <button class="details-btn">See Details</button>
-            <button class="remove-btn">Remove Player</button>
-        </section>
-        `;
-    $detailsBtn = $player.querySelector(".details-btn");
-    $removeBtn = $player.querySelector(".remove-btn");
-
-    $detailsBtn.addEventListener("click", async () => {
-      showLoading();
-      try {
-        await renderSinglePlayer(player.id);
-      } catch (err) {
-        console.error(err.message);
-      } finally {
-        hideLoading();
-      }
-    });
-
-    $removeBtn.addEventListener("click", async () => {
-      try {
-        const confirmRemove = confirm(
-          `Are you sure you want to remove ${player.name} from the roster?`
-        );
-        if (!confirmRemove) return;
-        showLoading();
-        await removePlayerById(player.id);
-        await renderAllPlayers();
-      } catch (err) {
-        console.error(err.message);
-      } finally {
-        hideLoading();
-      }
-    });
-
-    $players.appendChild($player);
+  $li.innerHTML = `
+  <a href="#selected">
+    <h3>${player.name}</h3>
+    <img src="${player.imageUrl}" alt="Picture of ${player.name}" style="width: 100px; height: auto;" />
+    </a>
+  `;
+  $li.addEventListener("click", async () => {
+    const fullPlayer = await fetchPlayerById(player.id);
+    renderSinglePlayer(fullPlayer);
   });
+  return $li;
+};
 
-  $main.innerHTML = "";
-  $main.appendChild($players);
-}
+const playerList = (players) => {
+  const $ul = document.createElement("ul");
+  $ul.classList.add("player-list");
 
-async function renderSinglePlayer(id) {
-  const player = await fetchPlayerById(id);
+  const $items = players.map(playerListItems);
+  $ul.replaceChildren(...$items);
 
-  $main.innerHTML = `
-    <section id="single-player">
-        <h2>${player.name}/${player.team?.name || "Unassigned"} - ${
-    player.status
-  }</h2>
-        <p>${player.breed}</p>
-        <img src="${player.imageUrl}" alt="Picture of ${player.name}" />
-        <button id="back-btn">Back to List</button>
-        </section>
-    `;
+  return $ul;
+};
 
-  $main.querySelector("#back-btn").addEventListener("click", async () => {
-    showLoading();
+const renderSinglePlayer = (player) => {
+  const $selection = document.querySelector("#selected");
+  $selection.innerHTML = `
+  <h2>${player.name}</h2>
+    <p>${player.breed}</p>
+    <p>${player.status}</p>
+    <img src="${player.imageUrl}" alt="Picture of ${player.name}" />
+    <section class="player-actions">
+      <button class="remove-btn">Remove Player</button>
+    </section>
+  `;
+  const $removeBtn = $selection.querySelector(".remove-btn");
+  $removeBtn.addEventListener("click", async () => {
+    const confirm = confirm("Confirm delete, this action cannot be undone.");
+    if (!confirm) return;
     try {
-      await renderAllPlayers();
-    } catch (err) {
-      console.error(err.message);
-    } finally {
-      hideLoading();
+      await removePlayerById(player.id);
+      await init();
+    } catch (error) {
+      console.log(error);
     }
   });
-}
+};
 
-async function init() {
+const removePlayerById = async (id) => {
   try {
-    await renderAllPlayers();
-    teams = await fetchAllTeams();
-  } catch (err) {
-    console.error(err);
-  } finally {
-    hideLoading();
+    await fetch(`${API}/players/${id}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error("Failed to remove player:", error);
   }
-}
+};
 
-$form.addEventListener("submit", async (e) => {
+const addNewPlayer = () => {
+  const $form = document.createElement("form");
+  $form.innerHTML = `
+  <div class="form-group">
+    <label for = "playerName">Player Name</label>
+    <input class="form-control" id="newPlayerName" placeholder="Winston, Cleo, Astro">
+  </div>
+    <div class="form-group">
+      <label for="Breed">Breed</label>
+      <input class="form-control" id="newPlayerBreed" placeholder="German Shepherd, Lhasa Apso, Siberian Husky">
+    </div>
+      <div class="form-group">
+      <label for="status">Status:</label>
+       <select id="status" name="status">
+          <option value="null">-Select one-</option>
+          <option value="field">Field</option>
+          <option value="bench">Benched</option>
+        </select>
+      </div>
+       <div class="form-group">
+        <label for="imgUrl">Picture</label>
+        <input class="form-control" id="newPlayerImage" placeholder="https://image.com">
+      </div>
+      <button type="submit" class="btn btn-primary">Invite Puppy</button>
+  `;
+  // $form.addEventListener("click", (e) => {
+  //   e.preventDefault();
+  // });
+  return $form;
+};
+
+const newPlayer = async (e) => {
   e.preventDefault();
-  const name = document.querySelector("#new-name").value;
-  const breed = document.querySelector("#new-breed").value;
-  const image = document.querySelector("#new-image").value;
 
-  showLoading();
+  const name = e.target[0].value;
+  const breed = e.target[1].value;
+  const status = e.target[2].value;
+  const imageUrl = e.target[3].value;
+  const obj = { name, breed, status, imageUrl };
+
+  // console.log("submitting player:", obj);
+
   try {
-    await createPlayer(name, breed, image);
-    renderAllPlayers();
-  } catch (err) {
-    console.error(err.message);
-  } finally {
-    document.querySelector("#new-name").value = "";
-    document.querySelector("#new-breed").value = "";
-    document.querySelector("#new-image").value = "";
-    hideLoading();
-  }
-});
+    const response = await fetch(`${API}/players`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(obj),
+    });
 
+    const data = await response.json();
+    console.log("New player created:", data);
+  } catch (error) {
+    console.error("Error creating player:", error);
+  }
+
+  await init();
+};
+
+const render = async () => {
+  $app.innerHTML = `
+  <h1>Puppy Bowl</h1>
+  <main>
+  <section id="player-selection">
+    <h2>Players</h2>
+    <p id="player-message">Please select a player to see more details.</p>
+    <div id="player-list"></div>
+  </section>
+  <section id="selected">
+  <h2>Player Details</h2>
+  </section>
+  <section id="newPlayer">
+    <h2>Add a new player:</h2>
+    <form id="newPlayerForm"></form>
+  </section>
+
+      </main>
+  `;
+
+  const players = await fetchAllPlayers();
+  const $list = playerList(players);
+  $app.querySelector("#player-list").replaceWith($list);
+
+  const $form = addNewPlayer(newPlayer);
+  $form.addEventListener("submit", newPlayer);
+  document.querySelector("#newPlayerForm").replaceWith($form);
+};
+
+const init = async () => {
+  await render();
+};
 init();
