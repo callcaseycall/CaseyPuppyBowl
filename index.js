@@ -29,11 +29,12 @@ const fetchPlayerById = async (id) => {
 
 const playerListItems = (player) => {
   const $li = document.createElement("li");
+  $li.classList.add("player-item");
 
   $li.innerHTML = `
   <a href="#selected">
     <h3>${player.name}</h3>
-    <img src="${player.imageUrl}" alt="Picture of ${player.name}" style="width: 100px; height: auto;" />
+    <img src="${player.imageUrl}" alt="Picture of ${player.name}" />
     </a>
   `;
   $li.addEventListener("click", async () => {

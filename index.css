@@ -1,4 +1,4 @@
-#main {
+/* #main {
   display: flex;
   gap: 20px;
   align-items: flex-start;
@@ -11,4 +11,29 @@
 
 #selected {
   flex: 1;
+} */
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.player-item {
+  padding: 10px;
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.player-item img {
+  width: 200px;
+  height: auto;
+  border-radius: 8px;
+}
+
+#selected {
+  border-radius: 8px;
 }
