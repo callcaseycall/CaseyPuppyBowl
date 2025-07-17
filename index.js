@@ -74,7 +74,7 @@ const renderSinglePlayer = (player) => {
       await init();
       document.querySelector("#selected").innerHTML = `
       <h2>Player Details</h2>
-      <p id="player-message">Select a player to see more details"</p>
+      <p id="player-message">Select a player to see more details</p>
       `;
     } catch (error) {
       console.log(error);
@@ -156,20 +156,23 @@ const render = async () => {
   $app.innerHTML = `
   <h1>Puppy Bowl</h1>
   <main>
-  <section id="player-selection">
-    <h2>Players</h2>
-    <p id="player-message">Please select a player to see more details.</p>
+   <div id="left-column">
+    <section id="player-selection">
+     <h2>Players</h2>
+     <p id="player-message">Please select a player to see more details.</p>
     <div id="player-list"></div>
   </section>
-  <section id="selected">
-  <h2>Player Details</h2>
-  </section>
-  <section id="newPlayer">
-    <h2>Add a new player:</h2>
-    <form id="newPlayerForm"></form>
-  </section>
 
-      </main>
+    <section id="newPlayer">
+     <h2>Add a new player:</h2>
+     <form id="newPlayerForm"></form>
+    </section>
+  </div>
+
+   <section id="selected">
+    <h2>Player Details</h2>
+  </section>
+</main>
   `;
 
   const players = await fetchAllPlayers();
