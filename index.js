@@ -67,11 +67,15 @@ const renderSinglePlayer = (player) => {
   `;
   const $removeBtn = $selection.querySelector(".remove-btn");
   $removeBtn.addEventListener("click", async () => {
-    const confirm = confirm("Confirm delete, this action cannot be undone.");
-    if (!confirm) return;
+    const confirmed = confirm("Confirm delete, this action cannot be undone.");
+    if (!confirmed) return;
     try {
       await removePlayerById(player.id);
       await init();
+      document.querySelector("#selected").innerHTML = `
+      <h2>Player Details</h2>
+      <p id="player-message">Select a player to see more details"</p>
+      `;
     } catch (error) {
       console.log(error);
     }
